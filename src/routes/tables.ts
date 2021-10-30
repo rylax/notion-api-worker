@@ -88,7 +88,7 @@ export async function tablesRoute(req: HandlerRequest) {
       collectionView.value.id,
       req.notionToken
     );
-    console.log('SCHEMA', JSON.stringify(schema))
+    // console.log('SCHEMA', JSON.stringify(schema))
     const collectionName = collection.value.name[0][0]
     const tableObject = { [collectionName]: rows }
     tables.push(tableObject)
