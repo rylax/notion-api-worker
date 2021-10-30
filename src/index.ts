@@ -1,8 +1,9 @@
-import {} from "@cloudflare/workers-types";
+import { } from "@cloudflare/workers-types";
 import { Router, Method } from "tiny-request-router";
 
 import { pageRoute } from "./routes/page";
 import { tableRoute } from "./routes/table";
+import { tablesRoute } from "./routes/tables";
 import { userRoute } from "./routes/user";
 import { searchRoute } from "./routes/search";
 import { createResponse } from "./response";
@@ -24,6 +25,7 @@ const router = new Router<Handler>();
 router.options("*", () => new Response(null, { headers: corsHeaders }));
 router.get("/v1/page/:pageId", pageRoute);
 router.get("/v1/table/:pageId", tableRoute);
+router.get("/v1/tables/:pageId", tablesRoute);
 router.get("/v1/user/:userId", userRoute);
 router.get("/v1/search", searchRoute);
 
@@ -62,7 +64,7 @@ const handleRequest = async (fetchEvent: FetchEvent): Promise<Response> => {
   if (cacheKey) {
     try {
       response = await cache.match(cacheKey);
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const getResponseAndPersist = async () => {

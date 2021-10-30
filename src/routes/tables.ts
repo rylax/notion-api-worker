@@ -56,7 +56,7 @@ export const getTableData = async (
   return { rows, schema: collectionRows };
 };
 
-export async function tableRoute(req: HandlerRequest) {
+export async function tablesRoute(req: HandlerRequest) {
   const pageId = parsePageId(req.params.pageId);
   const page = await fetchPageById(pageId!, req.notionToken);
 
@@ -67,21 +67,32 @@ export async function tableRoute(req: HandlerRequest) {
       401
     );
 
-  const collection = Object.keys(page.recordMap.collection).map(
+
+  let tables = []
+  const collections = Object.keys(page.recordMap.collection).map(
     (k) => page.recordMap.collection[k]
-  )[0];
-
-  const collectionView: {
-    value: { id: CollectionType["value"]["id"] };
-  } = Object.keys(page.recordMap.collection_view).map(
-    (k) => page.recordMap.collection_view[k]
-  )[0];
-
-  const { rows } = await getTableData(
-    collection,
-    collectionView.value.id,
-    req.notionToken
   );
+  for await (const [i, item] of collections.entries()) {
+    const collection = Object.keys(page.recordMap.collection).map(
+      (k) => page.recordMap.collection[k]
+    )[i];
+    //console.log('COLLECTION', JSON.stringify(collection.value.name[0][0]))
+    const collectionView: {
+      value: { id: CollectionType["value"]["id"] };
+    } = Object.keys(page.recordMap.collection_view).map(
+      (k) => page.recordMap.collection_view[k]
+    )[i];
 
-  return createResponse(rows);
+    const { rows, schema } = await getTableData(
+      collection,
+      collectionView.value.id,
+      req.notionToken
+    );
+    console.log('SCHEMA', JSON.stringify(schema))
+    const collectionName = collection.value.name[0][0]
+    const tableObject = { [collectionName]: rows }
+    tables.push(tableObject)
+  }
+
+  return createResponse(tables);
 }
