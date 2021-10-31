@@ -3,7 +3,7 @@ import { Router, Method } from "tiny-request-router";
 
 import { pageRoute } from "./routes/page";
 import { tableRoute } from "./routes/table";
-import { tablesRoute } from "./routes/tables";
+import { subcollectionPageRoute } from "./routes/subcollectionPage";
 import { userRoute } from "./routes/user";
 import { searchRoute } from "./routes/search";
 import { createResponse } from "./response";
@@ -25,7 +25,7 @@ const router = new Router<Handler>();
 router.options("*", () => new Response(null, { headers: corsHeaders }));
 router.get("/v1/page/:pageId", pageRoute);
 router.get("/v1/table/:pageId", tableRoute);
-router.get("/v1/tables/:pageId", tablesRoute);
+router.get("/v1/subcollectionPage/:pageId", subcollectionPageRoute);
 router.get("/v1/user/:userId", userRoute);
 router.get("/v1/search", searchRoute);
 

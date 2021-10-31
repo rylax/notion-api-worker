@@ -56,7 +56,7 @@ export const getTableData = async (
   return { rows, schema: collectionRows };
 };
 
-export async function tablesRoute(req: HandlerRequest) {
+export async function subcollectionPageRoute(req: HandlerRequest) {
   const pageId = parsePageId(req.params.pageId);
   const page = await fetchPageById(pageId!, req.notionToken);
 
@@ -68,15 +68,22 @@ export async function tablesRoute(req: HandlerRequest) {
     );
 
 
-  let tables = []
+  // console.log('PAGE', JSON.stringify(page.recordMap.block[Object.keys(page.recordMap.block)[0]].value.format.page_icon))
+  const title = page.recordMap.block[Object.keys(page.recordMap.block)[0]].value.properties.title[0][0] ? page.recordMap.block[Object.keys(page.recordMap.block)[0]].value.properties.title[0][0] : null
+  const emojiOrIcon = page.recordMap.block[Object.keys(page.recordMap.block)[0]].value.format.page_icon ? page.recordMap.block[Object.keys(page.recordMap.block)[0]].value.format.page_icon : null
+  const signedEmojiOrIcon = emojiOrIcon ? (emojiOrIcon.includes('http') ? signFileUrl(emojiOrIcon, pageId) : emojiOrIcon) : ''
+  console.log('signedEmojiOrIcon:', signedEmojiOrIcon)
   const collections = Object.keys(page.recordMap.collection).map(
     (k) => page.recordMap.collection[k]
   );
+  // let tables = []
+  let tables = new Map()
   for await (const [i, item] of collections.entries()) {
     const collection = Object.keys(page.recordMap.collection).map(
       (k) => page.recordMap.collection[k]
     )[i];
     //console.log('COLLECTION', JSON.stringify(collection.value.name[0][0]))
+    // console.log('COLLECTION', JSON.stringify(collection))
     const collectionView: {
       value: { id: CollectionType["value"]["id"] };
     } = Object.keys(page.recordMap.collection_view).map(
@@ -89,10 +96,27 @@ export async function tablesRoute(req: HandlerRequest) {
       req.notionToken
     );
     // console.log('SCHEMA', JSON.stringify(schema))
+
     const collectionName = collection.value.name[0][0]
     const tableObject = { [collectionName]: rows }
-    tables.push(tableObject)
+    console.log('collectionName', collectionName)
+    // leaving out root collection table as it's not part of the sub collection
+    if (collectionName !== 'Collections') {
+      tables.set(collectionName, rows)
+    }
   }
+  const responseObject = {
+    title: title,
+    icon: signedEmojiOrIcon,
+    tables: Object.fromEntries(tables)
+  }
+  return createResponse(responseObject);
+}
 
-  return createResponse(tables);
+
+function signFileUrl(url: any, blockId: any) {
+  const baseUrl = 'https://www.notion.so'
+  const notionUrl = `/image/${encodeURIComponent(url)}`
+  const query = `?table=block&id=${blockId}&cache=v2`
+  return baseUrl + notionUrl + query
 }
