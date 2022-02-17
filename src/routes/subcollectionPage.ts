@@ -70,7 +70,7 @@ export async function subcollectionPageRoute(req: HandlerRequest) {
 
   // console.log('PAGE', JSON.stringify(page.recordMap.block[Object.keys(page.recordMap.block)[0]].value.format.page_icon))
   const title = page.recordMap.block[Object.keys(page.recordMap.block)[0]].value.properties.title[0][0] ? page.recordMap.block[Object.keys(page.recordMap.block)[0]].value.properties.title[0][0] : null
-  const emojiOrIcon = page.recordMap.block[Object.keys(page.recordMap.block)[0]].value.format.page_icon ? page.recordMap.block[Object.keys(page.recordMap.block)[0]].value.format.page_icon : null
+  const emojiOrIcon = page.recordMap.block[Object.keys(page.recordMap.block)[0]].value.format && page.recordMap.block[Object.keys(page.recordMap.block)[0]].value.format.page_icon ? page.recordMap.block[Object.keys(page.recordMap.block)[0]].value.format.page_icon : null
   const signedEmojiOrIcon = emojiOrIcon ? (emojiOrIcon.includes('http') ? signFileUrl(emojiOrIcon, pageId) : emojiOrIcon) : ''
   console.log('signedEmojiOrIcon:', signedEmojiOrIcon)
   const collections = Object.keys(page.recordMap.collection).map(
