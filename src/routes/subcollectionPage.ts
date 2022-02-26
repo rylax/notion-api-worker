@@ -97,7 +97,10 @@ export async function subcollectionPageRoute(req: HandlerRequest) {
     );
     // console.log('SCHEMA', JSON.stringify(schema))
 
-    const collectionName = collection.value.name[0][0]
+    // console.log('COLLECTION value', collection.value)
+    // const collectionName = "TEST"
+    // const collectionName = collection.value.name[0][0]
+    const collectionName = collection.value.name ? collection.value.name[0][0] : "no_sub_collection_name"
     const tableObject = { [collectionName]: rows }
     console.log('collectionName', collectionName)
     // leaving out root collection table as it's not part of the sub collection
